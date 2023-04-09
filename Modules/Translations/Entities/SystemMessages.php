@@ -3,6 +3,7 @@
 namespace Modules\Translations\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SystemMessages extends Model
 {
@@ -13,4 +14,9 @@ class SystemMessages extends Model
     const CATEGORY_MOBILE = 2;
 
     protected $fillable = ["category", "message"];
+
+    public function translations(): HasMany
+    {
+        return $this->hasMany(SystemMessageTranslation::class, "system_message_id");
+    }
 }

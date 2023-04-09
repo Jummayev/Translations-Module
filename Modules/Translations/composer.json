@@ -18,6 +18,9 @@
     "autoload": {
         "psr-4": {
             "Modules\\Translations\\": ""
-        }
+        },
+        "files": [
+            "Modules\\Translations\\Helpers\\Helper.php"
+        ]
     }
 }

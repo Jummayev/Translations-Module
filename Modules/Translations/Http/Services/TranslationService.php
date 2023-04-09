@@ -23,7 +23,7 @@ class TranslationService
      */
     public function index(Request $request): JsonResponse
     {
-        $messages = SystemMessages::all();
+        $messages = (array)SystemMessages::query()->with("translations")->get();
         $json = [];
         if (count($messages) > 0) {
             foreach ($messages as $message) {
@@ -103,7 +103,7 @@ class TranslationService
             $languages = Language::query()->where("status", Language::STATUS_ACTIVE)->get();
             $data_lang = [];
             foreach ($languages as $lang) {
-                $model = SystemMessageTranslation::query()->where("system_message_id", $sours->id)->where( "language", $lang->code)->first();
+                $model = SystemMessageTranslation::query()->where("system_message_id", $sours->id)->where("language", $lang->code)->first();
                 if (!empty($model)) {
                     $data_lang[$lang->code] = $model->translation;
                 }
@@ -142,7 +142,7 @@ class TranslationService
         if ($model_exists->exists()) {
             $system_message_translation = clone $model;
             $system_message_translation->update(["translation" => $request->get("translation")]);
-        }else{
+        } else {
             $system_message_translation = SystemMessageTranslation::create([
                 "id" => $request->id,
                 "language" => $request->language,
@@ -173,4 +173,67 @@ class TranslationService
         ];
     }
 
+
+    public
+    function generateJson(int $category): bool
+    {
+        error_reporting(2245);
+        $languages = Language::query()->where("status", Language::STATUS_ACTIVE)->get()->toArray();
+        foreach ($languages as $lang) {
+
+            $messages = SystemMessages::query()
+                ->leftJoin("system_message_translations", "system_messages.id", "=", "system_message_translations.system_message_id")
+                ->select("system_messages.id", "system_messages.message", "system_message_translations.language_code", "system_message_translations.translation")
+                ->whereRaw("system_message_translations.language_code = {$lang["code"]} or system_message_translations.language_code is null)")
+                ->where("system_messages.category", "=", $category)
+                ->get()->toArray();
+
+            $data = [];
+            foreach ($messages as $message) {
+                if (!empty($message['translation'])) {
+                    $data[$message["message"]] = $message['translation'];
+                    continue;
+                }
+                $data[$message["message"]] = $message["message"];
+            }
+            $paths = config("translations.path");
+            foreach ($paths as $path) {
+                $link = $path . "/locales/" . $lang["code"] . "/translation.json";
+                if (!is_dir($path . "/locales/" . $lang["code"])) {
+                    mkdir($path . "/locales/" . $lang['code']);
+                }
+                unlink($path . "/locales/" . $lang["code"]);
+                $fp = fopen($link, "w");
+                fwrite($fp, json_encode($data, JSON_UNESCAPED_UNICODE));
+                fclose($fp);
+            }
+        }
+        return true;
+    }
+
+    public function gene($lang)
+    {
+        $lang = Language::query()->where(["code" => $lang])->first();
+        error_reporting(2245);
+        $messages = SystemMessages::all();
+
+        $data = [];
+        foreach ($messages as $message) {
+            $translation = SystemMessageTranslation::query()->where([
+                "id" => $message["id"],
+                "language_code" => $lang->code
+            ])->first();
+            if (is_object($translation) && strlen($translation->translation) !== 0) {
+                $data[$message["message"]] = $translation->translation;
+                continue;
+            }
+            $data[$message["message"]] = $message["message"];
+        }
+
+        $path = config("translations.path");
+
+
+        return $data;
+    }
 }
+

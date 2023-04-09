@@ -2,9 +2,9 @@
 
 namespace Modules\Translations\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
 use Modules\Translations\Entities\Language;
 
 class LanguageController extends Controller
@@ -13,7 +13,7 @@ class LanguageController extends Controller
      * Display a listing of the resource.
      * @return JsonResponse
      */
-    public function adminIndex()
+    public function adminIndex(): JsonResponse
     {
         return response()->json(Language::all());
     }
@@ -22,7 +22,7 @@ class LanguageController extends Controller
      * Display a listing of the resource.
      * @return JsonResponse
      */
-    public function clientIndex()
+    public function clientIndex(): JsonResponse
     {
         $languages = Language::query()->where("status", Language::STATUS_ACTIVE);
         return response()->json(Language::all());
@@ -33,7 +33,7 @@ class LanguageController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $request->validate(Language::rules());
 
@@ -47,7 +47,7 @@ class LanguageController extends Controller
      * @param Language $language
      * @return JsonResponse
      */
-    public function show(Language $language)
+    public function show(Language $language): JsonResponse
     {
         return response()->json($language);
     }
@@ -58,7 +58,7 @@ class LanguageController extends Controller
      * @param Language $language
      * @return JsonResponse
      */
-    public function update(Request $request, Language $language)
+    public function update(Request $request, Language $language): JsonResponse
     {
         $request->validate(Language::rules());
 
@@ -72,7 +72,7 @@ class LanguageController extends Controller
      * @param Language $language
      * @return JsonResponse
      */
-    public function destroy(Language $language)
+    public function destroy(Language $language): JsonResponse
     {
         $language->delete();
         return response()->json(["message" => "deleted"]);

@@ -19,6 +19,8 @@ return new class extends Migration
             $table->text('translation');
             $table->foreignId('system_message_id')->constrained("system_messages")->cascadeOnDelete();
             $table->timestamps();
+
+            $table->foreign("language_code")->references("code")->on("languages");
         });
     }
 

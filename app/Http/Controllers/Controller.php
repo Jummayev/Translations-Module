@@ -9,4 +9,11 @@ use Illuminate\Routing\Controller as BaseController;
 class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
+
+    public function index()
+    {
+        if (true) {
+            echo t("user not fount. username :username", ["username" => "Anvar"]);
+        }
+    }
 }

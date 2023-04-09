@@ -17,16 +17,16 @@ use Modules\Translations\Http\Controllers\LanguageController;
 
 Route::middleware("api")->group(function () {
     Route::prefix("admin/translations")->group(function () {
-        Route::get("list", "ranslationsController@list");
-        Route::post("list", "ranslationsController@change");
+        Route::get("list", "TranslationsController@list");
+        Route::post("list", "TranslationsController@change");
     });
 });
 
 Route::prefix("translations")->group(function () {
-    Route::get("/translation/{language}", "ranslationsController@index");
-    Route::post("/translation/{language}", "ranslationsController@store");
-    Route::delete("/{id:d+}", "ranslationsController@destroy");
-    Route::post("/translation", "ranslationsController@createTranslation");
+    Route::get("translation/{language}", "TranslationsController@");
+    Route::post("translation/{language}", "TranslationsController@store");
+    Route::delete("{systemMessage}", "TranslationsController@destroy")->whereNumber("systemMessage");
+    Route::post("translation", "TranslationsController@createTranslation");
 });
 
 Route::prefix("v1")->controller(LanguageController::class)->group(function (){

@@ -36,7 +36,18 @@ class TranslationsController extends Controller
      */
     public function frontendStore(Request $request)
     {
-        return response()->json(["message" => ""]);
+        $message = $request->get("message");
+
+        if (!empty($message)){
+            $message = SystemMessages::query()->where('message', $message)->first();
+            if (!($message instanceof SystemMessages)) {
+                $message = SystemMessages::query()->create([
+                    'category' => 'react',
+                    'message' => $message
+                ]);
+            }
+        }
+        return response()->json(["data" =>$message]);
     }
 
     /**
